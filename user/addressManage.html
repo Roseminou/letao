@@ -1,45 +1,89 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0" />
     <meta content="yes" name="apple-mobile-web-app-capable">
     <meta content="black" name="apple-mobile-web-app-status-bar-style">
     <meta content="telephone=no" name="format-detection">
     <title>收货地址管理</title>
     <link type="image/x-icon" rel="shortcut icon" href="../images/favicon.ico">
-    <link rel="stylesheet" href="../res/mui/css/mui.min.css"/>
-    <link rel="stylesheet" href="../res/fontAwesome/css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="../css/common.css"/>
-    <link rel="stylesheet" href="../css/user.css"/>
+    <link rel="stylesheet" href="../res/mui/css/mui.min.css" />
+    <link rel="stylesheet" href="../res/fontAwesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/user.css" />
+    <script src="../js/template-web.js"></script>
 </head>
+
 <body>
-<div class="cz_layout bgg">
-    <header class="cz_topBar">
-        <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
-        <span class="title">收货地址管理</span>
-    </header>
-    <div class="cz_container">
-        <div class="form_box">
-            <div class="mui-input-row">
-                <input name="delivery" type="text" placeholder="收货人">
-            </div>
-            <div class="mui-input-row">
-                <input name="postCode" type="text" placeholder="邮编">
-            </div>
-            <div class="mui-input-row">
-                <textarea name="address" id="textarea" rows="5" placeholder="多行文本框"></textarea>
-            </div>
-            <a href="index.html" class="mui-btn mui-btn-primary btn_login">确认</a>
+    <div class="cz_layout bgg">
+        <header class="cz_topBar">
+            <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
+            <span class="title">收货地址管理</span>
+        </header>
+        <div class="cz_container">
+            <form action="">
+                <div class="form_box">
+
+                </div>
+            </form>
         </div>
+        <footer class="cz_tabs">
+            <a class="tab_home fa fa-home" href="../index.html"><span>首页</span></a>
+            <a class="tab_cate fa fa-bars" href="../cate.html"><span>分类</span></a>
+            <a class="tab_cart fa fa-shopping-cart" href="../cart.html"><span>购物车</span></a>
+            <a class="tab_user fa fa-user" href="../user/index.html"><span>会员中心</span></a>
+        </footer>
     </div>
-    <footer class="cz_tabs">
-        <a class="tab_home fa fa-home" href="../index.html"><span>首页</span></a>
-        <a class="tab_cate fa fa-bars" href="../cate.html"><span>分类</span></a>
-        <a class="tab_cart fa fa-shopping-cart" href="../cart.html"><span>购物车</span></a>
-        <a class="tab_user fa fa-user" href="../user/index.html"><span>会员中心</span></a>
-    </footer>
-</div>
-<script src="../res/mui/js/mui.min.js"></script>
+    <script src="../js/jquery.js"></script>
+    <script src="../res/mui/js/mui.min.js"></script>
+    <script type="text/template" id="tpl">
+        {{each list value}}
+        <div class="mui-input-row">
+            <input name="recipients" type="text" placeholder="收货人" value={{value.recipients}}>
+        </div>
+        <div class="mui-input-row">
+            <input name="postCode" type="text" placeholder="邮编" value="{{value.postCode}}">
+        </div>
+        <div class="mui-input-row">
+            <textarea name="address" id="textarea" rows="5" placeholder="地址">{{value.address}}</textarea>
+        </div>
+        <div class="mui-input-row">
+            <textarea name="addressDetail" id="textarea" rows="5" placeholder="详细地址">{{value.addressDetail}}</textarea>
+        </div>
+        <input type="submit" class="mui-btn mui-btn-primary btn_login" value="确认"> {{/each}}
+    </script>
+    <script>
+        // 获取原来的地址
+        $.ajax({
+            url: '/api/address/queryAddress',
+            type: 'get',
+            success: function(info) {
+                var json = {
+                    list: info
+                };
+                var str = template('tpl', json);
+                $('.form_box').html(str);
+            }
+        })
+
+
+        // 修改收货地址
+        $('form').on('submit', function() {
+            // 获取表单信息
+            var data = $(this).serialize();
+            $.ajax({
+                url: '/api/address/updateAddress',
+                type: 'post',
+                data: data,
+                success: function(info) {
+                    console.log(info);
+                }
+            })
+            return false;
+        })
+    </script>
 </body>
+
 </html>

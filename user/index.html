@@ -27,7 +27,7 @@
                     <a class="mui-navigate-right" href="#account">
                         <img class="mui-media-object mui-pull-left head-img" id="head-img" src="../images/user.jpg">
                         <div class="mui-media-body">
-                            Hello MUI
+                            <span>Hello MUI</span>
                             <p class="mui-ellipsis">账号:hellomui</p>
                         </div>
                     </a>
@@ -64,11 +64,27 @@
             url: '/api/user/queryUserMessage',
             type: 'get',
             success: function(info) {
-                console.log(info);
+                // console.log(info);
                 // 2.根据响应结果判断是否登录
                 if (info.error) {
                     location.href = "../user/login.html";
                 }
+            }
+        })
+
+
+        // 个人中心信息
+        $.ajax({
+            url: '/api/user/queryUserMessage',
+            type: 'get',
+            success: function(info) {
+                // console.log(info);
+                var str = '账号:' + info.username;
+                $('.mui-media-body')
+                    .children('span')
+                    .text(info.username);
+                // console.log(str);
+                $('.mui-ellipsis').text(str);
             }
         })
 
