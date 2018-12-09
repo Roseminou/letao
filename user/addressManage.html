@@ -24,9 +24,7 @@
         </header>
         <div class="cz_container">
             <form action="">
-                <div class="form_box">
 
-                </div>
             </form>
         </div>
         <footer class="cz_tabs">
@@ -40,39 +38,51 @@
     <script src="../res/mui/js/mui.min.js"></script>
     <script type="text/template" id="tpl">
         {{each list value}}
-        <div class="mui-input-row">
-            <input name="recipients" type="text" placeholder="收货人" value={{value.recipients}}>
+        <div class="form_box">
+            <div class="mui-input-row">
+                <input name="recipients" type="text" placeholder="收货人" value={{value.recipients}}>
+            </div>
+            <div class="mui-input-row">
+                <input name="postcode" type="text" placeholder="邮编" value="{{value.postCode}}">
+            </div>
+            <div class="mui-input-row">
+                <textarea name="address" id="textarea" rows="5" placeholder="地址">{{value.address}}</textarea>
+            </div>
+            <div class="mui-input-row">
+                <textarea name="addressDetail" id="textarea" rows="5" placeholder="详细地址">{{value.addressDetail}}</textarea>
+            </div>
+            <input type="submit" class="mui-btn mui-btn-primary btn_login" value="确认">
         </div>
-        <div class="mui-input-row">
-            <input name="postCode" type="text" placeholder="邮编" value="{{value.postCode}}">
-        </div>
-        <div class="mui-input-row">
-            <textarea name="address" id="textarea" rows="5" placeholder="地址">{{value.address}}</textarea>
-        </div>
-        <div class="mui-input-row">
-            <textarea name="addressDetail" id="textarea" rows="5" placeholder="详细地址">{{value.addressDetail}}</textarea>
-        </div>
-        <input type="submit" class="mui-btn mui-btn-primary btn_login" value="确认"> {{/each}}
+        {{/each}}
     </script>
     <script>
-        // 获取原来的地址
+        var reg = /\d/;
+        var id = location.search.match(reg)[0];
+        // console.log(id);
+        // 获取数据库的地址
         $.ajax({
             url: '/api/address/queryAddress',
             type: 'get',
             success: function(info) {
+                var data = [info[id - 1]];
                 var json = {
-                    list: info
+                    list: data
                 };
+                // console.log(info);
                 var str = template('tpl', json);
-                $('.form_box').html(str);
+                $('form').html(str);
             }
         })
+
 
 
         // 修改收货地址
         $('form').on('submit', function() {
             // 获取表单信息
-            var data = $(this).serialize();
+            var info = $(this).serialize();
+            // console.log(info);
+            var data = info + '&id=' + id;
+            // console.log(data);
             $.ajax({
                 url: '/api/address/updateAddress',
                 type: 'post',
