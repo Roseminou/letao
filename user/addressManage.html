@@ -58,13 +58,20 @@
     <script>
         var reg = /\d/;
         var id = location.search.match(reg)[0];
-        // console.log(id);
+        console.log(id);
         // 获取数据库的地址
         $.ajax({
             url: '/api/address/queryAddress',
             type: 'get',
             success: function(info) {
-                var data = [info[id - 1]];
+                console.log(info);
+                for (var i = 0; i < info.length; i++) {
+                    if (info[i].id == id) {
+                        var data = [info[i]];
+                        // console.log(data);
+                    }
+                    // console.log(info[i].id);
+                }
                 var json = {
                     list: data
                 };
