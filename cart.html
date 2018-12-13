@@ -13,6 +13,20 @@
     <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/cart.css" />
+    <style>
+        .null {
+            width: 200px;
+            text-align: center;
+            margin: 20px 60px;
+            display: none;
+        }
+        
+        .kong {
+            width: 200px;
+            border-radius: 100px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -22,67 +36,15 @@
             <span class="title">购物车</span>
             <a href="javascript:;" class="icon_refresh fa fa-refresh"></a>
         </header>
-        <div class="cz_container mui-scroll-wrapper">
-            <ul class="mui-table-view mui-scroll">
-                <li data-product="" class="mui-table-view-cell">
-                    <div class="mui-slider-right mui-disabled">
-                        <a class="mui-btn mui-btn-blue">编辑</a>
-                        <a class="mui-btn mui-btn-red">删除</a>
-                    </div>
-                    <a href="javascript:;" class="mui-navigate-right mui-slider-handle">
-                        <img class="mui-media-object mui-pull-left" src="images/product.jpg">
-                        <div class="mui-media-body">
-                            <p class="name">热风2016年冬季新款男鞋高帮休闲皮鞋舒适韩版平底鞋H13M6315</p>
-                            <p class="info">
-                                <span class="price">&yen;100.00</span>
-                                <span class="oldPrice">&yen;299.90</span>
-                                <span class="number">x1</span>
-                            </p>
-                            <p><span class="size">鞋码：42</span></p>
-                        </div>
-                        <input type="checkbox" />
-                    </a>
-                </li>
-                <li data-product="" class="mui-table-view-cell">
-                    <div class="mui-slider-right mui-disabled">
-                        <a class="mui-btn mui-btn-blue">编辑</a>
-                        <a class="mui-btn mui-btn-red">删除</a>
-                    </div>
-                    <a href="javascript:;" class="mui-navigate-right mui-slider-handle">
-                        <img class="mui-media-object mui-pull-left" src="images/product.jpg">
-                        <div class="mui-media-body">
-                            <p class="name">热风2016年冬季新款男鞋高帮休闲皮鞋舒适韩版平底鞋H13M6315</p>
-                            <p class="info">
-                                <span class="price">&yen;100.00</span>
-                                <span class="oldPrice">&yen;299.90</span>
-                                <span class="number">x1</span>
-                            </p>
-                            <p><span class="size">鞋码：42</span></p>
-                        </div>
-                        <input type="checkbox" />
-                    </a>
-                </li>
-                <li data-product="" class="mui-table-view-cell">
-                    <div class="mui-slider-right mui-disabled">
-                        <a class="mui-btn mui-btn-blue">编辑</a>
-                        <a class="mui-btn mui-btn-red">删除</a>
-                    </div>
-                    <a href="javascript:;" class="mui-navigate-right mui-slider-handle">
-                        <img class="mui-media-object mui-pull-left" src="images/product.jpg">
-                        <div class="mui-media-body">
-                            <p class="name">热风2016年冬季新款男鞋高帮休闲皮鞋舒适韩版平底鞋H13M6315</p>
-                            <p class="info">
-                                <span class="price">&yen;100.00</span>
-                                <span class="oldPrice">&yen;299.90</span>
-                                <span class="number">x1</span>
-                            </p>
-                            <p><span class="size">鞋码：42</span></p>
-                        </div>
-                        <input type="checkbox" />
-                    </a>
-                </li>
+        <div class="cz_container mui-scroll-wrapper" id="detail">
+            <div class="null">
+                购物车里空空如也
+                <img src="./images/kong.jpeg" class="kong">
+            </div>
+            <ul class="mui-table-view mui-scroll ul">
+
             </ul>
-            <div class="cart_order">订单总额：&yen;1022.00 <a href="#">生成订单</a></div>
+            <div class="total"></div>
         </div>
         <footer class="cz_tabs">
             <a class="tab_home fa fa-home" href="index.html"><span>首页</span></a>
@@ -93,14 +55,88 @@
     </div>
     <script src="js/jquery.js"></script>
     <script src="res/mui/js/mui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script type="text/template" id="tpl">
+        {{each data val}}
+        <li data-product="" class="mui-table-view-cell">
+            <div class="mui-slider-right mui-disabled">
+                <a class=" mui-btn mui-btn-blue edit" dataId="{{val.id}}">编辑</a>
+                <a class="mui-btn mui-btn-red delete" dataId="{{val.id}}">删除</a>
+            </div>
+            <a href="javascript:;" class="mui-navigate-right mui-slider-handle">
+                <img class="mui-media-object mui-pull-left" src="images/product.jpg">
+                <div class="mui-media-body">
+                    <p class="name">{{val.proName}}</p>
+                    <p class="info">
+                        <span class="price">&yen;{{val.price}}</span>
+                        <span class="oldPrice">&yen;{{val.oldPrice}}</span>
+                        <span class="number">x{{val.num}}</span>
+                    </p>
+                    <p><span class="size">鞋码：{{val.size}}</span></p>
+                </div>
+                <input type="checkbox" />
+            </a>
+        </li>
+        {{/each}}
+    </script>
+    <script type="text/template" id="add">
+        <div class="cart_order">订单总额：&yen;{{total}} <a href="#">生成订单</a></div>
+    </script>
     <script>
+        // 获取购物车信息
+        $.ajax({
+            url: '/api/cart/queryCart',
+            type: 'get',
+            success: function(info) {
+                // console.log(info);
+                if (info.error) {
+                    $('.ul').hide();
+                    $('.null').show();
+                }
+                // 购物车内容
+                var html = template('tpl', {
+                    data: info
+                });
+                $('.mui-scroll').html(html);
+
+
+                // 计算总价
+                var n = 0;
+                for (var i = 0; i < info.length; i++) {
+                    n += info[i].price * info[i].num;
+                }
+                // console.log(n.toFixed(2));
+                var add = template('add', {
+                    total: n.toFixed(2)
+                });
+                $('.total').html(add);
+
+            }
+        })
+
+
+
+
+
+
         mui(function() {
             mui.init();
             mui('.mui-table-view').on('tap', '.mui-btn-red', function() {
                 var btnArray = ['是', '否'];
                 mui.confirm('你要删除这件商品吗？', '温馨提示', btnArray, function(e) {
                     if (e.index == 0) {
-
+                        var id = $('.delete').attr('dataId');
+                        $.ajax({
+                            url: '/api/address/deleteAddress',
+                            type: 'post',
+                            data: {
+                                id: id
+                            },
+                            success: function(info) {
+                                console.log(info);
+                                location.reload();
+                            }
+                        })
                     } else {
 
                     }
@@ -109,11 +145,39 @@
             mui('.mui-table-view').on('tap', '.mui-btn-blue', function(e) {
                 e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
                 var btnArray = ['确定', '取消'];
-                var template = '<input type="number" placeholder="选择数量"/><br>' +
-                    '<input type="text" placeholder="选择尺码" />';
+                var template = '<form><input type="number" name="num" placeholder="选择数量"/><br>' +
+                    '<input type="text" name="size" placeholder="选择尺码" /></form>';
                 mui.confirm(template, '编辑商品', btnArray, function(e) {
                     if (e.index == 0) {
+                        // 获取编辑信息
+                        var data = $('form').serialize();
+                        data = data.split('&');
+                        // console.log(data);
+                        data1 = data[0].split('=');
+                        data2 = data[1].split('=');
+                        var num = data1[1];
+                        var size = data2[1];
+                        // 数组的遍历，另一种取值的方法
+                        // data.forEach(function(item) {
+                        //     data.push(item.split('='));
+                        // })
 
+                        // console.log(num, size);
+                        var id = $('.edit').attr('dataId');
+                        // console.log(id);
+                        $.ajax({
+                            url: '/api/cart/updateCart',
+                            type: 'post',
+                            data: {
+                                id: id,
+                                size: size,
+                                num: num,
+                            },
+                            success: function(info) {
+                                console.log(info);
+                                location.reload();
+                            }
+                        })
                     } else {
 
                     }

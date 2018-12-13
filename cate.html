@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/cate.css" />
+
 </head>
 
 <body>
@@ -24,17 +25,11 @@
         </header>
         <div class="cz_container">
             <div class="cate_slide">
-                <ul>
-                    <li class="now">运动馆</li>
-                    <li>女士馆</li>
-                    <li>男士馆</li>
-                    <li>帆布馆</li>
-                    <li>户外馆</li>
-                </ul>
+
             </div>
             <div class="cate_content">
                 <div class="mui-scroll-wrapper">
-                    <div>
+                    <div class="mui-scroll">
                         <span class="title">热门品牌购</span>
                         <ul class="mui-clearfix">
                             <li>
@@ -83,49 +78,7 @@
                                 </a>
                             </li>
                         </ul>
-                        <span class="title">运动休闲</span>
-                        <ul class="mui-clearfix">
-                            <li>
-                                <a href="#"><img src="images/brand1.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><img src="images/brand2.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><img src="images/brand3.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><img src="images/brand4.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><img src="images/brand5.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><img src="images/brand6.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><img src="images/brand7.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><img src="images/brand8.png" alt="" />
-                                    <p>耐克</p>
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="detail"></div>
                     </div>
                 </div>
             </div>
@@ -137,8 +90,94 @@
             <a class="tab_user fa fa-user" href="user/index.html"><span>会员中心</span></a>
         </footer>
     </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/template-web.js"></script>
     <script src="res/mui/js/mui.min.js"></script>
+    <script type="text/template" id="topTpl">
+        <!-- 一级分类的模板 -->
+        <ul>
+            {{each list val}}
+            <!-- class="now" -->
+            <li dataId="{{val.id}}">{{val.categoryName}}</li>
+            {{/each}}
+        </ul>
+
+    </script>
+    <script type="text/template" id="childTpl">
+        <span class="title">{{text}}</span>
+        <ul class="mui-clearfix">
+            {{each rows val}}
+            <li>
+                <a href="#"><img src="/api{{val.brandLogo}}" alt="" />
+                    <p>{{val.brandName}}</p>
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+
+    </script>
     <script>
+        // 一级分类
+        $.ajax({
+            url: '/api/category/queryTopCategory',
+            type: 'get',
+            success: function(info) {
+                console.log(info);
+
+                var html = template('topTpl', {
+                    list: info.rows
+                });
+                $('.cate_slide').html(html);
+                $('.cate_slide').find('li').eq(0).addClass('now');
+
+            }
+        })
+
+        // 默认二级分类
+        $.ajax({
+            url: '/api/category/querySecondCategory',
+            type: 'get',
+            data: {
+                id: 1
+            },
+            success: function(info) {
+                // console.log(info);
+                info.text = "运动馆";
+                var html = template('childTpl', info);
+                $('.detail').html(html);
+            }
+        })
+
+
+        // 事件委托给产品类型cate_slide添加点击事件
+        $('.cate_slide').on('click', 'li', function() {
+            $(this).addClass('now').siblings().removeClass('now');
+            var id = $(this).attr('dataId');
+            // console.log(id);
+            var text = $(this).text();
+            // 二级分类的模板
+            $.ajax({
+                url: '/api/category/querySecondCategory',
+                type: 'get',
+                data: {
+                    id: id
+                },
+                success: function(info) {
+                    // console.log(info);
+                    info.text = text;
+                    var html = template('childTpl', info);
+                    $('.detail').html(html);
+                }
+            })
+        })
+
+
+
+
+
+
+
+
         mui(function() {
             mui('.mui-scroll-wrapper').scroll({
                 scrollY: true, //是否竖向滚动

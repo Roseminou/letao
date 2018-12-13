@@ -71,8 +71,7 @@
         </div>
         <div class="p_price">
             <span class="fold"><span>{{discount}}</span>折</span>
-            价格：<strong class="present">¥
-            {{price}}</strong>
+            价格：<strong class="present">¥{{price}}</strong>
             <del class="original">¥{{oldPrice}}</del>
         </div>
         <div class="p_size">
@@ -106,12 +105,18 @@
                 "id": id
             },
             success: function(info) {
-                // console.log(info);
+                console.log(info);
                 // 计算折扣
                 // toFixed() 将数字保留几位
                 info.discount = (info.price / info.oldPrice * 10).toFixed(1);
                 // 将型号拆分成数组
-                info.size = info.size.split('-');
+                var arr = info.size.split('-');
+                info.size = [];
+
+                for (var i = arr[0]; i <= arr[1]; i++) {
+                    info.size.push(i);
+                }
+                // console.log(info.size);
 
                 var html = template('tpl', info);
                 $('#detail').html(html);
@@ -120,10 +125,11 @@
 
         // 给型号添加点击事件
         $('#detail').on('click', '.btn_size', function() {
-                // alert(1);
-                $(this).addClass('active').siblings().removeClass('active');
-            })
-            // 添加数量
+            // alert(1);
+            $(this).addClass('active').siblings().removeClass('active');
+        })
+
+        // 添加数量
         $('#detail').on('click', '.jia', function() {
             if ($('.num').val() >= $('.total').text() - 0) return;
             var num = $('.num').val();
@@ -149,12 +155,12 @@
         $('.btn_addCart').on('click', function() {
             var size = $('span.active').text();
             var num = $('.num').val();
-            // console.log(size, num);
+            // console.log(size, num, id);
             $.ajax({
                 url: '/api/cart/addCart',
                 type: 'post',
                 data: {
-                    proDuctId: id,
+                    productId: id,
                     num: num,
                     size: size,
                 },

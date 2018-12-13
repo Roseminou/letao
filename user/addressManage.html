@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="../res/fontAwesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="../css/common.css" />
     <link rel="stylesheet" href="../css/user.css" />
-    <script src="../js/template-web.js"></script>
 </head>
 
 <body>
@@ -35,6 +34,7 @@
         </footer>
     </div>
     <script src="../js/jquery.js"></script>
+    <script src="../js/template-web.js"></script>
     <script src="../res/mui/js/mui.min.js"></script>
     <script type="text/template" id="tpl">
         {{each list value}}
@@ -56,7 +56,7 @@
         {{/each}}
     </script>
     <script>
-        var reg = /\d/;
+        var reg = /\d+/;
         var id = location.search.match(reg)[0];
         console.log(id);
         // 获取数据库的地址
@@ -64,7 +64,7 @@
             url: '/api/address/queryAddress',
             type: 'get',
             success: function(info) {
-                console.log(info);
+                // console.log(info);
                 for (var i = 0; i < info.length; i++) {
                     if (info[i].id == id) {
                         var data = [info[i]];
@@ -75,9 +75,8 @@
                 var json = {
                     list: data
                 };
-                // console.log(info);
-                var str = template('tpl', json);
-                $('form').html(str);
+                var html = template('tpl', json);
+                $('form').html(html);
             }
         })
 
@@ -95,7 +94,8 @@
                 type: 'post',
                 data: data,
                 success: function(info) {
-                    console.log(info);
+                    // console.log(info);
+                    location.href = './address.html';
                 }
             })
             return false;
